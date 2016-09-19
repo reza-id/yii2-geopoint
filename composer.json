@@ -1,0 +1,22 @@
+{
+    "name": "reza-id/yii2-geopoint",
+    "description": "Yii2 ActiveRecord supporting MySQL spatial pint data",
+    "keywords": ["yii", "yii2", "extension", "data", "db", "spatial", "MySQL", "map", "geo"],
+    "type": "yii2-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Reza Agustiana",
+            "email": "agustiana@reza.web.id",
+            "homepage": "http://reza.web.id"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "rezaid\\geopoint\\": ""
+        }
+    }
+}
