@@ -3,6 +3,7 @@
 namespace rezaid\geopoint;
 
 use yii\db\ActiveQuery as YiiActiveQuery;
+use yii\db\Exception;
 
 class ActiveQuery extends YiiActiveQuery {
 
@@ -21,15 +22,17 @@ class ActiveQuery extends YiiActiveQuery {
 
         if ($modelCls::getDb()->driverName === 'mysql') {
             $subQuery = $this->create($this)->from($modelCls::tableName())
-                ->select(['*', '_d' => "($lenPerDegree * ST_Distance($attribute, ST_PointFromText(:point)))"])
+                ->select([$modelCls::tableName().'.*', '_d' => "($lenPerDegree * ST_Distance($attribute, ST_PointFromText(:point)))"])
                 ->params([':point' => "POINT($lat $lng)"]);
         } else if ($modelCls::getDb()->driverName === 'pgsql') {
             $subQuery = $this->create($this)->from($modelCls::tableName())
-                ->select(['*', '_d' => "($lenPerDegree * ($attribute <-> POINT(:lt,:lg)))"])
+                ->select([$modelCls::tableName().'.*', '_d' => "($lenPerDegree * ($attribute <-> POINT(:lt,:lg)))"])
                 ->params([':lg' => $lng, ':lt' => $lat]);
-        }
+        } else {
+			throw new Exception('Only MqSQL and PostgreSQL are supported by ' . self::className());
+		}
 
-        $this->from([$subQuery])
+        $this->from(['distance' => $subQuery])
             ->andWhere([ '<', '_d', $radius ])
             ->orderBy([
                 '_d' => SORT_ASC
@@ -61,7 +64,7 @@ class ActiveQuery extends YiiActiveQuery {
 
         if (! $this->_skipPrep) {   // skip in case of queryScalar; it's not needed, and we get an SQL error (duplicate column names)
             if (empty($this->select))   {
-                $this->select('*');
+                $this->select($modelClass::tableName().'.*');
                 $this->allColumns();
             }
             else   {
