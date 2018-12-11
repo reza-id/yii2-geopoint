@@ -32,7 +32,7 @@ class ActiveQuery extends YiiActiveQuery {
 			throw new Exception('Only MqSQL and PostgreSQL are supported by ' . self::className());
 		}
 
-        $this->from(['distance' => $subQuery])
+        $this->from([$modelCls::tableName() => $subQuery])
             ->andWhere([ '<', '_d', $radius ])
             ->orderBy([
                 '_d' => SORT_ASC
